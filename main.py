@@ -1,5 +1,5 @@
 import os
-import cv2
+import cv2 
 from cvzone.PoseModule import PoseDetector
 
 # Inicialización de variables
