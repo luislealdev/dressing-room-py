@@ -397,6 +397,338 @@
 
 
 
+# import os
+# import cv2
+# import numpy as np
+# from cvzone.PoseModule import PoseDetector
+
+# # Inicialización de la cámara
+# cap = cv2.VideoCapture(0)
+# detector = PoseDetector()
+
+# # Ruta de las imágenes de las camisetas
+# shirtFolderPath = "assets/tshirts"
+# listShirts = os.listdir(shirtFolderPath)
+# shirtRatioHeightWidth = 1.3  # Este valor puede necesitar ajuste
+
+# # Inicializa el número de imagen para la selección de la camiseta
+# imageNumber = 0
+
+# while True:
+#     success, img = cap.read()
+#     if not success:
+#         print("Error al leer de la cámara.")
+#         break
+
+#     img = detector.findPose(img, draw=True)
+#     lmList, _ = detector.findPosition(img, draw=True)
+
+#     if lmList:
+#         shoulderLeft = lmList[11][1:3] if len(lmList) > 11 else None
+#         shoulderRight = lmList[12][1:3] if len(lmList) > 12 else None
+
+#         if shoulderLeft and shoulderRight:
+#             torsoWidth = np.linalg.norm(np.array(shoulderLeft) - np.array(shoulderRight))
+#             torsoHeight = torsoWidth * shirtRatioHeightWidth
+
+#             shirtWidth = int(torsoWidth * 1.2)
+#             shirtHeight = int(torsoHeight)
+
+#             centerX = (shoulderLeft[0] + shoulderRight[0]) // 2
+#             centerY = (shoulderLeft[1] + shoulderRight[1]) // 2
+
+#             # Ajustar la posición vertical
+#             centerY += int((lmList[1][1] - centerY) * 0.5)  # Suponiendo que lmList[1] es el cuello
+
+#             top_left_x = max(centerX - shirtWidth // 2, 0)
+#             top_left_y = max(centerY - shirtHeight // 2, 0)
+
+#             imgShirtPath = os.path.join(shirtFolderPath, listShirts[imageNumber])
+#             imgShirt = cv2.imread(imgShirtPath, cv2.IMREAD_UNCHANGED)
+#             if imgShirt is None:
+#                 print(f"No se pudo cargar la imagen: {imgShirtPath}")
+#                 continue
+
+#             imgShirt = cv2.resize(imgShirt, (shirtWidth, shirtHeight))
+#             shirtRGB = imgShirt[:, :, :3]
+#             shirtAlpha = imgShirt[:, :, 3]
+
+#             for c in range(0, 3):
+#                 img[top_left_y:top_left_y+shirtHeight, top_left_x:top_left_x+shirtWidth, c] = img[top_left_y:top_left_y+shirtHeight, top_left_x:top_left_x+shirtWidth, c] * (1 - shirtAlpha/255.0) + shirtRGB[:, :, c] * (shirtAlpha/255.0)
+
+#             cv2.rectangle(img, (top_left_x, top_left_y), (top_left_x + shirtWidth, top_left_y + shirtHeight), (0, 255, 0), 2)
+
+#     cv2.imshow("DressIA", img)
+
+#     if cv2.waitKey(1) & 0xFF == ord('q'):
+#         break
+
+# cap.release()
+# cv2.destroyAllWindows()
+
+
+
+# import os
+# import cv2
+# import numpy as np
+# from cvzone.PoseModule import PoseDetector
+
+# # Inicialización de la cámara
+# cap = cv2.VideoCapture(0)
+# detector = PoseDetector()
+
+# # Ruta de las imágenes de las camisetas
+# shirtFolderPath = "assets/tshirts"
+# listShirts = os.listdir(shirtFolderPath)
+
+# # Relación de aspecto de la camiseta (esto podría necesitar ajuste)
+# shirtRatioHeightWidth = 1.3  
+
+# # Inicializa el número de imagen para la selección de la camiseta
+# imageNumber = 0
+
+# while True:
+#     success, img = cap.read()
+#     if not success:
+#         print("Error al leer de la cámara.")
+#         break
+
+#     img = detector.findPose(img, draw=True)
+#     lmList, _ = detector.findPosition(img, draw=True)
+
+#     if lmList:
+#         shoulderLeft = lmList[11][1:3] if len(lmList) > 11 else None
+#         shoulderRight = lmList[12][1:3] if len(lmList) > 12 else None
+
+#         if shoulderLeft and shoulderRight:
+#             torsoWidth = np.linalg.norm(np.array(shoulderLeft) - np.array(shoulderRight))
+#             torsoHeight = torsoWidth * shirtRatioHeightWidth
+
+#             shirtWidth = int(torsoWidth * 1.2)
+#             shirtHeight = int(torsoHeight)
+
+#             centerX = (shoulderLeft[0] + shoulderRight[0]) // 2
+#             centerY = (shoulderLeft[1] + shoulderRight[1]) // 2
+
+#             centerY += int((lmList[1][1] - centerY) * 0.5)  # Suponiendo que lmList[1] es el cuello
+
+#             top_left_x = max(centerX - shirtWidth // 2, 0)
+#             top_left_y = max(centerY - shirtHeight // 2, 0)
+
+#             bottom_right_x = min(top_left_x + shirtWidth, img.shape[1])
+#             bottom_right_y = min(top_left_y + shirtHeight, img.shape[0])
+
+#             shirtWidth = bottom_right_x - top_left_x
+#             shirtHeight = bottom_right_y - top_left_y
+
+#             imgShirtPath = os.path.join(shirtFolderPath, listShirts[imageNumber])
+#             imgShirt = cv2.imread(imgShirtPath, cv2.IMREAD_UNCHANGED)
+#             if imgShirt is None:
+#                 print(f"No se pudo cargar la imagen: {imgShirtPath}")
+#                 continue
+
+#             imgShirt = cv2.resize(imgShirt, (shirtWidth, shirtHeight))
+#             shirtRGB = imgShirt[:, :, :3]
+#             shirtAlpha = imgShirt[:, :, 3]
+
+#             for c in range(0, 3):
+#                 img[top_left_y:bottom_right_y, top_left_x:bottom_right_x, c] = img[top_left_y:bottom_right_y, top_left_x:bottom_right_x, c] * (1 - shirtAlpha/255.0) + shirtRGB[:, :, c] * (shirtAlpha/255.0)
+
+#             cv2.rectangle(img, (top_left_x, top_left_y), (bottom_right_x, bottom_right_y), (0, 255, 0), 2)
+
+#     cv2.imshow("DressIA", img)
+
+#     if cv2.waitKey(1) & 0xFF == ord('q'):
+#         break
+
+# cap.release()
+# cv2.destroyAllWindows()
+
+
+
+# import os
+# import cv2
+# import numpy as np
+# from cvzone.PoseModule import PoseDetector
+
+# # Inicialización de la cámara
+# cap = cv2.VideoCapture(0)
+# detector = PoseDetector()
+
+# # Ruta de las imágenes de las camisetas
+# shirtFolderPath = "assets/tshirts"
+# listShirts = os.listdir(shirtFolderPath)
+
+# # Relación de aspecto de la camiseta
+# shirtRatioHeightWidth = 1.3  # Este valor puede necesitar ajuste
+
+# # Inicializa el número de imagen para la selección de la camiseta
+# imageNumber = 0
+
+# while True:
+#     success, img = cap.read()
+#     if not success:
+#         print("Error al leer de la cámara.")
+#         break
+
+#     img = detector.findPose(img, draw=False)
+#     lmList, _ = detector.findPosition(img, draw=False)
+
+#     if lmList:
+#         # Asumiendo que los índices 11 y 12 son hombros izquierdo y derecho
+#         shoulderLeft = lmList[11][1:3] if len(lmList) > 11 else None
+#         shoulderRight = lmList[12][1:3] if len(lmList) > 12 else None
+
+#         if shoulderLeft and shoulderRight:
+#             # Cálculos del torso y camiseta
+#             torsoWidth = np.linalg.norm(np.array(shoulderLeft) - np.array(shoulderRight))
+#             torsoHeight = torsoWidth * shirtRatioHeightWidth
+
+#             shirtWidth = int(torsoWidth * 1.2)
+#             shirtHeight = int(torsoHeight)
+
+#             # Suponiendo que lmList[1] es el cuello
+#             neck = lmList[1][1:3] if len(lmList) > 1 else None
+
+#             if neck:
+#                 # Cálculos para la transformación de perspectiva
+#                 neckX, neckY = neck
+#                 centerX = (shoulderLeft[0] + shoulderRight[0]) // 2
+#                 centerY = (shoulderLeft[1] + shoulderRight[1]) // 2
+#                 centerY += int((neckY - centerY) * 0.5)  # Ajuste para la posición vertical
+
+#                 top_left_x = max(centerX - shirtWidth // 2, 0)
+#                 top_left_y = max(centerY - shirtHeight // 2, 0)
+
+#                 bottom_right_x = min(top_left_x + shirtWidth, img.shape[1])
+#                 bottom_right_y = min(top_left_y + shirtHeight, img.shape[0])
+
+#                 # Asegurarse de que la región seleccionada de 'img' tenga el mismo tamaño que 'imgShirt'
+#                 shirtWidth = bottom_right_x - top_left_x
+#                 shirtHeight = bottom_right_y - top_left_y
+
+#                 # Cargar la imagen de la camiseta
+#                 imgShirtPath = os.path.join(shirtFolderPath, listShirts[imageNumber])
+#                 imgShirt = cv2.imread(imgShirtPath, cv2.IMREAD_UNCHANGED)
+#                 if imgShirt is None:
+#                     print(f"No se pudo cargar la imagen: {imgShirtPath}")
+#                     continue
+
+#                 # Redimensionar la imagen de la camiseta y la máscara alfa para que coincidan con la región de destino
+#                 imgShirt = cv2.resize(imgShirt, (shirtWidth, shirtHeight))
+#                 shirtAlpha = imgShirt[:, :, 3] / 255.0
+#                 shirtRGB = imgShirt[:, :, :3]
+
+#                 # Superponer la camiseta en la imagen
+#                 for c in range(0, 3):
+#                     imgSection = img[top_left_y:bottom_right_y, top_left_x:bottom_right_x, c]
+#                     imgSectionResized = cv2.resize(imgSection, (shirtWidth, shirtHeight))
+
+#                     # Ahora imgSectionResized y shirtRGB deberían tener las mismas dimensiones
+#                     img[top_left_y:bottom_right_y, top_left_x:bottom_right_x, c] = (
+#                         (1.0 - shirtAlpha) * imgSectionResized + shirtAlpha * shirtRGB[:, :, c]
+#                     )
+
+#     # Mostrar la imagen resultante
+#     cv2.imshow("DressIA", img)
+
+#     if cv2.waitKey(1) & 0xFF == ord('q'):
+#         break
+
+# cap.release()
+# cv2.destroyAllWindows()
+
+
+
+
+
+
+# import os
+# import cv2
+# import numpy as np
+# from cvzone.PoseModule import PoseDetector
+
+# # Inicialización de la cámara
+# cap = cv2.VideoCapture(0)
+# detector = PoseDetector()
+
+# # Ruta de las imágenes de las camisetas
+# shirtFolderPath = "assets/tshirts"
+# listShirts = os.listdir(shirtFolderPath)
+# imageNumber = 0  # Asegúrate de que este índice sea válido en la lista de camisetas
+
+# # Relación de aspecto de la camiseta
+# shirtRatioHeightWidth = 1.3  # Este valor puede necesitar ajuste
+
+# while True:
+#     success, img = cap.read()
+#     if not success:
+#         print("Error al leer de la cámara.")
+#         break
+
+#     img = detector.findPose(img, draw=False)
+#     lmList, _ = detector.findPosition(img, draw=False)
+
+#     if lmList:
+#         # Asumiendo que los índices 11 y 12 son hombros izquierdo y derecho
+#         shoulderLeft = lmList[11][1:3] if len(lmList) > 11 else None
+#         shoulderRight = lmList[12][1:3] if len(lmList) > 12 else None
+
+#         if shoulderLeft and shoulderRight:
+#             torsoWidth = np.linalg.norm(np.array(shoulderLeft) - np.array(shoulderRight))
+#             torsoHeight = torsoWidth * shirtRatioHeightWidth
+
+#             shirtWidth = int(torsoWidth * 1.2)
+#             shirtHeight = int(torsoHeight * 1.2)
+
+#             # Suponiendo que lmList[1] es el cuello
+#             neck = lmList[1][1:3] if len(lmList) > 1 else None
+#             if neck:
+#                 neckX, neckY = neck
+#                 centerX = (shoulderLeft[0] + shoulderRight[0]) // 2
+#                 centerY = (shoulderLeft[1] + shoulderRight[1]) // 2
+#                 centerY += int((neckY - centerY) * 0.5)  # Ajuste para la posición vertical
+
+#                 top_left_x = max(centerX - shirtWidth // 2, 0)
+#                 top_left_y = max(centerY - shirtHeight // 2, 0)
+
+#                 bottom_right_x = min(top_left_x + shirtWidth, img.shape[1])
+#                 bottom_right_y = min(top_left_y + shirtHeight, img.shape[0])
+
+#                 # Asegurar que la región de destino tiene las dimensiones correctas
+#                 region_width = bottom_right_x - top_left_x
+#                 region_height = bottom_right_y - top_left_y
+
+#                 # Cargar la imagen de la camiseta
+#                 imgShirtPath = os.path.join(shirtFolderPath, listShirts[imageNumber])
+#                 imgShirt = cv2.imread(imgShirtPath, cv2.IMREAD_UNCHANGED)
+#                 if imgShirt is None:
+#                     print(f"No se pudo cargar la imagen: {imgShirtPath}")
+#                     continue
+
+#                 # Redimensionar la imagen de la camiseta y la máscara alfa para que coincidan con la región de destino
+#                 imgShirt = cv2.resize(imgShirt, (region_width, region_height))
+#                 shirtAlpha = imgShirt[:, :, 3] / 255.0
+#                 shirtRGB = imgShirt[:, :, :3]
+
+#                 # Superponer la camiseta en la imagen
+#                 for c in range(0, 3):
+#                     img[top_left_y:top_left_y+region_height, top_left_x:top_left_x+region_width, c] = (
+#                         img[top_left_y:top_left_y+region_height, top_left_x:top_left_x+region_width, c] * (1 - shirtAlpha) +
+#                         shirtRGB[:, :, c] * shirtAlpha
+#                     )
+
+#     cv2.imshow("DressIA", img)
+
+#     if cv2.waitKey(1) & 0xFF == ord('q'):
+#         break
+
+# cap.release()
+# cv2.destroyAllWindows()
+
+
+
+
 import os
 import cv2
 import numpy as np
@@ -409,10 +741,10 @@ detector = PoseDetector()
 # Ruta de las imágenes de las camisetas
 shirtFolderPath = "assets/tshirts"
 listShirts = os.listdir(shirtFolderPath)
-shirtRatioHeightWidth = 1.3  # Este valor puede necesitar ajuste
+imageNumber = 0  # Asegúrate de que este índice sea válido en la lista de camisetas
 
-# Inicializa el número de imagen para la selección de la camiseta
-imageNumber = 0
+# Relación de aspecto de la camiseta
+shirtRatioHeightWidth = 1.3  # Este valor puede necesitar ajuste
 
 while True:
     success, img = cap.read()
@@ -420,28 +752,37 @@ while True:
         print("Error al leer de la cámara.")
         break
 
-    img = detector.findPose(img, draw=True)
-    lmList, _ = detector.findPosition(img, draw=True)
+    img = detector.findPose(img, draw=False)
+    lmList, _ = detector.findPosition(img, draw=False)
 
     if lmList:
         shoulderLeft = lmList[11][1:3] if len(lmList) > 11 else None
         shoulderRight = lmList[12][1:3] if len(lmList) > 12 else None
+        hipLeft = lmList[23][1:3] if len(lmList) > 23 else None
+        hipRight = lmList[24][1:3] if len(lmList) > 24 else None
+        neck = lmList[1][1:3] if len(lmList) > 1 else None
 
-        if shoulderLeft and shoulderRight:
+        if shoulderLeft and shoulderRight and hipLeft and hipRight and neck:
             torsoWidth = np.linalg.norm(np.array(shoulderLeft) - np.array(shoulderRight))
+            hipWidth = np.linalg.norm(np.array(hipLeft) - np.array(hipRight))
             torsoHeight = torsoWidth * shirtRatioHeightWidth
 
-            shirtWidth = int(torsoWidth * 1.2)
-            shirtHeight = int(torsoHeight)
+            shirtWidth = int((hipWidth + torsoWidth) / 2 * 1.2)
+            shirtHeight = int(torsoHeight * 1.2)
 
+            neckX, neckY = neck
             centerX = (shoulderLeft[0] + shoulderRight[0]) // 2
             centerY = (shoulderLeft[1] + shoulderRight[1]) // 2
-
-            # Ajustar la posición vertical
-            centerY += int((lmList[1][1] - centerY) * 0.5)  # Suponiendo que lmList[1] es el cuello
+            centerY += int((neckY - centerY) * 0.5)
 
             top_left_x = max(centerX - shirtWidth // 2, 0)
             top_left_y = max(centerY - shirtHeight // 2, 0)
+
+            bottom_right_x = min(top_left_x + shirtWidth, img.shape[1])
+            bottom_right_y = min(top_left_y + shirtHeight, img.shape[0])
+
+            region_width = bottom_right_x - top_left_x
+            region_height = bottom_right_y - top_left_y
 
             imgShirtPath = os.path.join(shirtFolderPath, listShirts[imageNumber])
             imgShirt = cv2.imread(imgShirtPath, cv2.IMREAD_UNCHANGED)
@@ -449,19 +790,46 @@ while True:
                 print(f"No se pudo cargar la imagen: {imgShirtPath}")
                 continue
 
-            imgShirt = cv2.resize(imgShirt, (shirtWidth, shirtHeight))
+            imgShirt = cv2.resize(imgShirt, (region_width, region_height))
+            shirtAlpha = imgShirt[:, :, 3] / 255.0
             shirtRGB = imgShirt[:, :, :3]
-            shirtAlpha = imgShirt[:, :, 3]
 
             for c in range(0, 3):
-                img[top_left_y:top_left_y+shirtHeight, top_left_x:top_left_x+shirtWidth, c] = img[top_left_y:top_left_y+shirtHeight, top_left_x:top_left_x+shirtWidth, c] * (1 - shirtAlpha/255.0) + shirtRGB[:, :, c] * (shirtAlpha/255.0)
-
-            cv2.rectangle(img, (top_left_x, top_left_y), (top_left_x + shirtWidth, top_left_y + shirtHeight), (0, 255, 0), 2)
+                img[top_left_y:top_left_y+region_height, top_left_x:top_left_x+region_width, c] = (
+                        img[top_left_y:top_left_y+region_height, top_left_x:top_left_x+region_width, c] * (1 - shirtAlpha) +
+                        shirtRGB[:, :, c] * shirtAlpha
+                )
 
     cv2.imshow("DressIA", img)
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    key = cv2.waitKey(1)
+    if key == ord('q'):
         break
+    elif key == ord('c'):
+        img_with_clothing = img.copy()
+        cv2.imwrite("persona_con_camisa.jpg", img_with_clothing)
+        print("Imagen con la camiseta puesta guardada como 'persona_con_camisa.jpg'")
+    elif key == ord('r'):
+        if lmList:
+            shoulderWidth = np.linalg.norm(np.array(shoulderLeft) - np.array(shoulderRight))
+            torsoWidth = np.linalg.norm(np.array(hipLeft) - np.array(hipRight))
+
+            report_text = f"Tamaño de hombros: {shoulderWidth:.2f} px\nTamaño de torso: {torsoWidth:.2f} px\n"
+
+            # Lógica de recomendaciones de tallas
+            size_recommendation = ""
+            if torsoWidth < 100:
+                size_recommendation += "Talla S podría ser apropiada.\n"
+            elif 100 <= torsoWidth < 150:
+                size_recommendation += "Talla M podría ser apropiada.\n"
+            else:
+                size_recommendation += "Talla L podría ser apropiada.\n"
+
+            report_text += f"Recomendaciones:\n{size_recommendation}"
+
+            with open('reporte_tallas.txt', 'a') as file:
+                file.write(report_text)
+                print("Reporte guardado en 'reporte_tallas.txt'")
 
 cap.release()
 cv2.destroyAllWindows()
